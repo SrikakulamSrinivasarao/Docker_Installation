@@ -1,0 +1,77 @@
+
+Docker & Docker Compose Setup on Ubuntu 24.04 LTS
+=================================================
+
+Overview:
+---------
+This guide walks you through installing Docker Engine, Docker Compose (plugin-based),
+and fixing permission issues so you can run Docker as a non-root user.
+
+Step 1: System Update & Install Prerequisites
+---------------------------------------------
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg lsb-release
+
+Step 2: Add Docker’s Official GPG Key
+-------------------------------------
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+Step 3: Add Docker’s APT Repository
+-----------------------------------
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+Step 4: Install Docker Engine, CLI, and Compose Plugin
+------------------------------------------------------
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+Step 5: Verify Installation
+---------------------------
+docker --version
+docker compose version
+
+Step 6: Run Docker as a Non-Root User
+-------------------------------------
+Add Current User to docker Group:
+  sudo usermod -aG docker $USER
+
+Apply Group Changes Without Reboot:
+  newgrp docker
+
+Note: If this doesn’t work, log out and log back in, or reboot.
+
+Step 7: Test Docker Compose
+---------------------------
+Example docker-compose.yml:
+----------------------------
+services:
+  web:
+    image: nginx
+    ports:
+      - "8080:80"
+
+Run:
+----
+docker compose up -d
+
+Visit: http://localhost:8080
+
+Common Errors & Fixes
+---------------------
+permission denied on /var/run/docker.sock   --> Add user to docker group + newgrp docker
+version is obsolete warning                 --> Remove version: from docker-compose.yml
+Cannot connect to Docker daemon             --> Ensure Docker is running: sudo systemctl start docker
+
+Final Check
+-----------
+docker info
+
+Done!
+-----
+You’re now fully Dockerized on Ubuntu 24.04 LTS.
