@@ -1,0 +1,10 @@
+
+Save → docker save -o file.tar image:tag
+
+Load → docker load -i file.tar
+
+Tag → docker tag <image_id> repo/name:tag
+
+Backup All → docker save -o backup-$(date +%Y%m%d).tar $(docker images --format "{{.Repository}}:{{.Tag}}")
+
+Prune → docker image prune -a
